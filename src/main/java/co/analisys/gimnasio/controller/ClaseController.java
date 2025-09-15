@@ -4,6 +4,7 @@ import co.analisys.gimnasio.model.Clase;
 import co.analisys.gimnasio.service.ClaseService;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.format.annotation.DateTimeFormat;
 
@@ -23,11 +24,13 @@ public class ClaseController {
 
     // Endpoints CRUD básicos
     @GetMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_TRAINER')")
     public List<Clase> getAll() {
         return service.findAll();
     }
 
     @GetMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_TRAINER')")
     public ResponseEntity<Clase> getById(@PathVariable Long id) {
         Optional<Clase> clase = service.findById(id);
         return clase.map(ResponseEntity::ok)
@@ -35,6 +38,7 @@ public class ClaseController {
     }
 
     @PostMapping
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TRAINER')")
     public ResponseEntity<Clase> create(@RequestBody Clase clase) {
         try {
             Clase nuevaClase = service.save(clase);
@@ -45,6 +49,7 @@ public class ClaseController {
     }
 
     @PutMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TRAINER')")
     public ResponseEntity<Clase> update(@PathVariable Long id, @RequestBody Clase clase) {
         try {
             clase.setId(id);
@@ -56,6 +61,7 @@ public class ClaseController {
     }
 
     @DeleteMapping("/{id}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TRAINER')")
     public ResponseEntity<Void> delete(@PathVariable Long id) {
         try {
             service.deleteById(id);
@@ -67,16 +73,19 @@ public class ClaseController {
 
     // Endpoints de búsqueda específicos
     @GetMapping("/entrenador/{entrenadorAsignado}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_TRAINER')")
     public List<Clase> getByEntrenador(@PathVariable String entrenadorAsignado) {
         return service.findByEntrenadorAsignado(entrenadorAsignado);
     }
 
     @GetMapping("/estado/{estado}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_TRAINER')")
     public List<Clase> getByEstado(@PathVariable String estado) {
         return service.findByEstado(estado);
     }
 
     @GetMapping("/nivel/{nivelDificultad}")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_TRAINER')")
     public List<Clase> getByNivelDificultad(@PathVariable String nivelDificultad) {
         return service.findByNivelDificultad(nivelDificultad);
     }
@@ -87,6 +96,7 @@ public class ClaseController {
     }
 
     @GetMapping("/fechas")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_MEMBER', 'ROLE_TRAINER')")
     public List<Clase> getByFechaRange(
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaInicio,
             @RequestParam @DateTimeFormat(iso = DateTimeFormat.ISO.DATE_TIME) LocalDateTime fechaFin) {
@@ -95,6 +105,7 @@ public class ClaseController {
 
     // Endpoints de acciones específicas
     @PutMapping("/{id}/cancelar")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TRAINER')")
     public ResponseEntity<Clase> cancelarClase(@PathVariable Long id) {
         try {
             Clase claseCancelada = service.cancelarClase(id);
@@ -105,6 +116,7 @@ public class ClaseController {
     }
 
     @PutMapping("/{id}/completar")
+    @PreAuthorize("hasAnyRole('ROLE_ADMIN', 'ROLE_TRAINER')")
     public ResponseEntity<Clase> completarClase(@PathVariable Long id) {
         try {
             Clase claseCompletada = service.completarClase(id);
